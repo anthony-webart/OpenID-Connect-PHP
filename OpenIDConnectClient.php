@@ -171,7 +171,7 @@ class OpenIDConnectClient
      * @return bool
      * @throws OpenIDConnectClientException
      */
-    public function authenticate() {
+    public function authenticate($districtId) {
 
         // Do a preemptive check to see if the provider has thrown an error from a previous redirect
         if (isset($_REQUEST['error'])) {
@@ -230,7 +230,7 @@ class OpenIDConnectClient
 
         } else {
 
-            $this->requestAuthorization();
+            $this->requestAuthorization($districtId);
             return false;
         }
 
@@ -331,18 +331,18 @@ class OpenIDConnectClient
      * Start Here
      * @return void
      */
-    private function requestAuthorization() {
+    private function requestAuthorization($districtId = null) {
 
         $auth_endpoint = $this->getProviderConfigValue("authorization_endpoint");
         $response_type = "code";
 
         // Generate and store a nonce in the session
         // The nonce is an arbitrary value
-        $nonce = $this->generateRandString();
+        $nonce = $districtId ?: $this->generateRandString();
         $_SESSION['openid_connect_nonce'] = $nonce;
 
         // State essentially acts as a session key for OIDC
-        $state = $this->generateRandString();
+        $state = $districtId ?: $this->generateRandString();
         $_SESSION['openid_connect_state'] = $state;
 
         $auth_params = array_merge($this->authParams, array(
